@@ -376,15 +376,11 @@ endif()
 
 install(DIRECTORY include/tbb DESTINATION ${TBB_INSTALL_INCLUDE_DIR})
 
-set(TBB_CMAKE_PACKAGE_INSTALL_DIR "lib/cmake/tbb" CACHE PATH
-    "Installation directory for CMake package files")
-mark_as_advanced(TBB_CMAKE_PACKAGE_INSTALL_DIR)
-
 install(EXPORT tbbTargets
-        FILE tbb-targets.cmake NAMESPACE "tbb::"
-        DESTINATION ${TBB_CMAKE_PACKAGE_INSTALL_DIR})
-install(FILES "${CMAKE_SOURCE_DIR}/tbb-config.cmake"
-        DESTINATION ${TBB_CMAKE_PACKAGE_INSTALL_DIR})
+  NAMESPACE TBB::
+  FILE TBBTargets.cmake
+  DESTINATION ${CMAKE_INSTALL_DATADIR}/cmake/tbb)
+
 
 # version_string.ver
 if (UNIX AND NOT TBB_NO_DATE)
