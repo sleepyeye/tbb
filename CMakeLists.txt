@@ -245,7 +245,7 @@ if (TBB_BUILD_STATIC)
   set_property(TARGET tbb_static APPEND PROPERTY COMPILE_DEFINITIONS "__TBB_DYNAMIC_LOAD_ENABLED=0")
   set_property(TARGET tbb_static APPEND PROPERTY COMPILE_DEFINITIONS "__TBB_SOURCE_DIRECTLY_INCLUDED=1")
   set_property(TARGET tbb_static APPEND_STRING PROPERTY COMPILE_FLAGS ${ENABLE_RTTI})
-  install(TARGETS tbb_static ARCHIVE DESTINATION ${TBB_INSTALL_ARCHIVE_DIR})
+  install(TARGETS tbb_static ARCHIVE DESTINATION ${TBB_INSTALL_ARCHIVE_DIR} EXPORT tbbTargets)
   if (MSVC)
     target_compile_definitions(tbb_static PUBLIC __TBB_NO_IMPLICIT_LINKAGE=1)
   endif()
@@ -271,9 +271,10 @@ if (TBB_BUILD_SHARED)
   endif()
 
   install(TARGETS tbb
-          LIBRARY DESTINATION ${TBB_INSTALL_LIBRARY_DIR}
-          ARCHIVE DESTINATION ${TBB_INSTALL_ARCHIVE_DIR}
-          RUNTIME DESTINATION ${TBB_INSTALL_RUNTIME_DIR})
+    EXPORT tbbTargets
+    LIBRARY DESTINATION ${TBB_INSTALL_LIBRARY_DIR}
+    ARCHIVE DESTINATION ${TBB_INSTALL_ARCHIVE_DIR}
+    RUNTIME DESTINATION ${TBB_INSTALL_RUNTIME_DIR})
   if (UNIX AND NOT APPLE)
     target_link_libraries(tbb PUBLIC pthread dl)
   endif()
@@ -305,7 +306,7 @@ if(TBB_BUILD_TBBMALLOC)
     if (MSVC)
       target_compile_definitions(tbbmalloc_static PUBLIC __TBB_NO_IMPLICIT_LINKAGE=1 __TBBMALLOC_NO_IMPLICIT_LINKAGE=1)
     endif()
-    install(TARGETS tbbmalloc_static ARCHIVE DESTINATION ${TBB_INSTALL_ARCHIVE_DIR})
+    install(TARGETS tbbmalloc_static ARCHIVE DESTINATION ${TBB_INSTALL_ARCHIVE_DIR} EXPORT tbbTargets)
   endif()
 
   if (TBB_BUILD_SHARED)
@@ -324,9 +325,10 @@ if(TBB_BUILD_TBBMALLOC)
       target_compile_definitions(tbbmalloc PUBLIC __TBB_NO_IMPLICIT_LINKAGE=1 __TBBMALLOC_NO_IMPLICIT_LINKAGE=1)
     endif()
     install(TARGETS tbbmalloc
-            LIBRARY DESTINATION ${TBB_INSTALL_LIBRARY_DIR}
-            ARCHIVE DESTINATION ${TBB_INSTALL_ARCHIVE_DIR}
-            RUNTIME DESTINATION ${TBB_INSTALL_RUNTIME_DIR})
+      EXPORT tbbTargets
+      LIBRARY DESTINATION ${TBB_INSTALL_LIBRARY_DIR}
+      ARCHIVE DESTINATION ${TBB_INSTALL_ARCHIVE_DIR}
+      RUNTIME DESTINATION ${TBB_INSTALL_RUNTIME_DIR})
     if (UNIX AND NOT APPLE)
       target_link_libraries(tbbmalloc PUBLIC pthread dl)
     endif()
@@ -341,7 +343,7 @@ if(TBB_BUILD_TBBMALLOC_PROXY)
     set_property(TARGET tbbmalloc_proxy_static APPEND PROPERTY COMPILE_DEFINITIONS "__TBB_DYNAMIC_LOAD_ENABLED=0")
     set_property(TARGET tbbmalloc_proxy_static APPEND PROPERTY COMPILE_DEFINITIONS "__TBB_SOURCE_DIRECTLY_INCLUDED=1")
     set_property(TARGET tbbmalloc_proxy_static APPEND_STRING PROPERTY COMPILE_FLAGS ${DISABLE_RTTI})
-    install(TARGETS tbbmalloc_proxy_static ARCHIVE DESTINATION ${TBB_INSTALL_ARCHIVE_DIR})
+    install(TARGETS tbbmalloc_proxy_static ARCHIVE DESTINATION ${TBB_INSTALL_ARCHIVE_DIR} EXPORT tbbTargets)
   endif()
 
   if (TBB_BUILD_SHARED)
@@ -350,9 +352,10 @@ if(TBB_BUILD_TBBMALLOC_PROXY)
     set_property(TARGET tbbmalloc_proxy APPEND_STRING PROPERTY COMPILE_FLAGS ${DISABLE_RTTI})
     target_link_libraries(tbbmalloc_proxy PUBLIC tbbmalloc)
     install(TARGETS tbbmalloc_proxy
-            LIBRARY DESTINATION ${TBB_INSTALL_LIBRARY_DIR}
-            ARCHIVE DESTINATION ${TBB_INSTALL_ARCHIVE_DIR}
-            RUNTIME DESTINATION ${TBB_INSTALL_RUNTIME_DIR})
+      EXPORT tbbTargets
+      LIBRARY DESTINATION ${TBB_INSTALL_LIBRARY_DIR}
+      ARCHIVE DESTINATION ${TBB_INSTALL_ARCHIVE_DIR}
+      RUNTIME DESTINATION ${TBB_INSTALL_RUNTIME_DIR})
     if (UNIX AND NOT APPLE)
       target_link_libraries(tbbmalloc_proxy PUBLIC pthread dl)
     endif()
@@ -360,6 +363,16 @@ if(TBB_BUILD_TBBMALLOC_PROXY)
 endif()
 
 install(DIRECTORY include/tbb DESTINATION ${TBB_INSTALL_INCLUDE_DIR})
+
+set(TBB_CMAKE_PACKAGE_INSTALL_DIR "lib/cmake/tbb" CACHE PATH
+    "Installation directory for CMake package files")
+mark_as_advanced(TBB_CMAKE_PACKAGE_INSTALL_DIR)
+
+install(EXPORT tbbTargets
+        FILE tbb-targets.cmake NAMESPACE "tbb::"
+        DESTINATION ${TBB_CMAKE_PACKAGE_INSTALL_DIR})
+install(FILES "${CMAKE_SOURCE_DIR}/tbb-config.cmake"
+        DESTINATION ${TBB_CMAKE_PACKAGE_INSTALL_DIR})
 
 # version_string.ver
 if (UNIX AND NOT TBB_NO_DATE)
