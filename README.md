@@ -5,6 +5,23 @@
 [![Build Status](https://travis-ci.org/wjakob/tbb.svg?branch=master)](https://travis-ci.org/wjakob/tbb)
 [![Build status](https://ci.appveyor.com/api/projects/status/fvepmk5nxekq27r8?svg=true)](https://ci.appveyor.com/project/wjakob/tbb/branch/master)
 
+This git repository is folked repository of [wjakob/tbb](https://github.com/wjakob/tbb) for 
+personal usage. 
+Additional feature of repository is this repository supports target export 
+so that it can support *nested* ``add_subdirectory`` command. 
+You may want this feature if you want to support ``add_subdirectory`` for 
+your library so that it can be consumed by other library or app.
+
+
+Also, I want to mention that
+ [tschw/tbb](https://github.com/tschw/tbb/tree/target-exports)
+already implemented this feature. However, his folk does not contain recent version of 
+*tbb*(TBB2019U6) so I decided to open new folk.
+
+
+All credit goes to wjakob and tschw.
+
+
 This is git repository is currently based on TBB 2019 Update 6 and will be
 updated from time to time to track the most recent release. The only
 modification is the addition of a CMake-based build system.
