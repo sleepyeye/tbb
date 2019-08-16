@@ -240,12 +240,16 @@ add_custom_target(tbb_def_files DEPENDS tbb.def tbbmalloc.def)
 # TBB library
 if (TBB_BUILD_STATIC)
   add_library(tbb_static STATIC ${tbb_src})
-  target_include_directories(tbb_static INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/include")
+  target_include_directories(tbb_static INTERFACE
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:${TBB_INSTALL_INCLUDE_DIR}>)
   set_property(TARGET tbb_static APPEND PROPERTY COMPILE_DEFINITIONS "__TBB_BUILD=1")
   set_property(TARGET tbb_static APPEND PROPERTY COMPILE_DEFINITIONS "__TBB_DYNAMIC_LOAD_ENABLED=0")
   set_property(TARGET tbb_static APPEND PROPERTY COMPILE_DEFINITIONS "__TBB_SOURCE_DIRECTLY_INCLUDED=1")
   set_property(TARGET tbb_static APPEND_STRING PROPERTY COMPILE_FLAGS ${ENABLE_RTTI})
-  install(TARGETS tbb_static ARCHIVE DESTINATION ${TBB_INSTALL_ARCHIVE_DIR} EXPORT tbbTargets)
+  install(TARGETS tbb_static
+    EXPORT tbbTargets
+    ARCHIVE DESTINATION ${TBB_INSTALL_ARCHIVE_DIR})
   if (MSVC)
     target_compile_definitions(tbb_static PUBLIC __TBB_NO_IMPLICIT_LINKAGE=1)
   endif()
@@ -257,7 +261,9 @@ endif()
 
 if (TBB_BUILD_SHARED)
   add_library(tbb SHARED ${tbb_src})
-  target_include_directories(tbb INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/include")
+  target_include_directories(tbb INTERFACE
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:${TBB_INSTALL_INCLUDE_DIR}>)
   set_property(TARGET tbb APPEND PROPERTY COMPILE_DEFINITIONS "__TBB_BUILD=1")
   set_property(TARGET tbb APPEND_STRING PROPERTY COMPILE_FLAGS ${ENABLE_RTTI})
   add_dependencies(tbb tbb_def_files)
@@ -270,11 +276,12 @@ if (TBB_BUILD_SHARED)
     set_property(TARGET tbb APPEND PROPERTY LINK_FLAGS "-Wl,-version-script,\"${CMAKE_CURRENT_BINARY_DIR}/tbb.def\"")
   endif()
 
-  install(TARGETS tbb
+  install (TARGETS tbb
     EXPORT tbbTargets
     LIBRARY DESTINATION ${TBB_INSTALL_LIBRARY_DIR}
     ARCHIVE DESTINATION ${TBB_INSTALL_ARCHIVE_DIR}
     RUNTIME DESTINATION ${TBB_INSTALL_RUNTIME_DIR})
+
   if (UNIX AND NOT APPLE)
     target_link_libraries(tbb PUBLIC pthread dl)
   endif()
@@ -306,7 +313,9 @@ if(TBB_BUILD_TBBMALLOC)
     if (MSVC)
       target_compile_definitions(tbbmalloc_static PUBLIC __TBB_NO_IMPLICIT_LINKAGE=1 __TBBMALLOC_NO_IMPLICIT_LINKAGE=1)
     endif()
-    install(TARGETS tbbmalloc_static ARCHIVE DESTINATION ${TBB_INSTALL_ARCHIVE_DIR} EXPORT tbbTargets)
+    install(TARGETS tbbmalloc_static
+      EXPORT tbbTargets
+      ARCHIVE DESTINATION ${TBB_INSTALL_ARCHIVE_DIR})
   endif()
 
   if (TBB_BUILD_SHARED)
@@ -343,7 +352,9 @@ if(TBB_BUILD_TBBMALLOC_PROXY)
     set_property(TARGET tbbmalloc_proxy_static APPEND PROPERTY COMPILE_DEFINITIONS "__TBB_DYNAMIC_LOAD_ENABLED=0")
     set_property(TARGET tbbmalloc_proxy_static APPEND PROPERTY COMPILE_DEFINITIONS "__TBB_SOURCE_DIRECTLY_INCLUDED=1")
     set_property(TARGET tbbmalloc_proxy_static APPEND_STRING PROPERTY COMPILE_FLAGS ${DISABLE_RTTI})
-    install(TARGETS tbbmalloc_proxy_static ARCHIVE DESTINATION ${TBB_INSTALL_ARCHIVE_DIR} EXPORT tbbTargets)
+    install(TARGETS tbbmalloc_proxy_static
+      EXPORT tbbTargets
+      ARCHIVE DESTINATION ${TBB_INSTALL_ARCHIVE_DIR})
   endif()
 
   if (TBB_BUILD_SHARED)
@@ -361,6 +372,7 @@ if(TBB_BUILD_TBBMALLOC_PROXY)
     endif()
   endif()
 endif()
+
 
 install(DIRECTORY include/tbb DESTINATION ${TBB_INSTALL_INCLUDE_DIR})
 
